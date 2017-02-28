@@ -53,7 +53,7 @@ Like in this screenshot:
 
 Almost there.  Now, sign up for a [Mailgun](https://mailgun.com) account, which is free.  You'll need to be able to enter DNS records to enable email delivery for your domain.  Follow the directions for setting up your Mailgun account, then take note of your API keys.  
 
-Now, all you need to do is download the pre-built binary from the releases page that's appropriate for your system.
+Now, all you need to do is download the pre-built binary from the [releases page](https://github.com/BTBurke/twilio-voice/releases) that's appropriate for your system.
 
 From the command line, run
 
