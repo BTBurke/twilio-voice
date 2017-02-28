@@ -29,7 +29,7 @@ Yes, you'll have to pay a per-minute fee for every call, a monthly fee for your 
 
 ### Getting it running
 
-First, sign up for a Twilio account and buy a virtual number from the console after you fund your account.  If you have a Linux or OS X computer, download ngrok.
+First, sign up for a Twilio account and buy a virtual number from the console after you fund your account.  Then download [ngrok](https://ngrok.com).
 
 From the terminal start ngrok:
 
@@ -41,7 +41,7 @@ Take note of your generated URL listed under Forwarding:
 
 ![ngrok config](img/ngrok.png)
 
-In the Twilio console, enter this URL with the route `/call/` tacked on the end.  Make sure you end with the final `/` so from the screen shot above I would enter:
+In the Twilio console, enter this URL with the route `/call/` tacked on the end.  Make sure you end with the final `/`.  From the screen shot above I would enter:
 
 ```
 http://60abbe91.ngrok.io/call/
@@ -53,7 +53,7 @@ Like in this screenshot:
 
 Almost there.  Now, sign up for a [Mailgun](https://mailgun.com) account, which is free.  You'll need to be able to enter DNS records to enable email delivery for your domain.  Follow the directions for setting up your Mailgun account, then take note of your API keys.  
 
-Now, all you need to do is download the pre-built binary from the [releases page](https://github.com/BTBurke/twilio-voice/releases) that's appropriate for your system.
+Now, all you need to do is download the pre-built binary from the [releases page](https://github.com/BTBurke/twilio-voice/releases) that is appropriate for your system.
 
 From the command line, run
 
@@ -65,7 +65,7 @@ And, it probably didn't work, but that's because we haven't configured it.
 
 ### Configuration
 
-Configuration is done via environment variables.  If you're handy on the command line, you know how to do this.  If not, open a file in a text editor and call it env.sh.  Enter the following details:
+Configuration is done via environment variables.  If you're handy on the command line, you know how to do this.  If not, open a file in a text editor and call it `env.sh`.  Enter the following details:
 
 ```
 export MAILGUN_PUBLIC_KEY="your MG public key"
@@ -77,14 +77,14 @@ export VOICEMAIL_SCRIPT="what you want the voicemail prompt to say"
 export VOICEMAIL_FILE="relative path to WAV or MP3 file to play as voicemail prompt"
 ```
 
-Now run 
+Now run:
 
 ```
 source env.sh
 ./twilio-voice
 ```
 
-If everything is set up correctly, you'll see that it's running a server on port 8080, which Twilio can access via ngrok on your home computer.
+If everything is set up correctly, you'll see that it's running a server on port 8080 which Twilio can access via ngrok on your home computer.
 
 Give it a test by calling your virtual number.  It should ring your phone.  Don't answer it and wait for the voicemail prompt.  Leave a message and wait for the transcription to come to your inbox. 
 
@@ -92,17 +92,17 @@ That's it!
 
 ### How it works
 
-Twilio needs to figure out what to do with your call when someone calls your virtual number.  What this project does is run a simple server that responds with the commands necessary to tell Twilio to forward the incoming call to your phone. 
+Twilio needs to figure out what to do with the call when someone calls your virtual number.  What this project does is run a simple server that responds with the commands necessary to tell Twilio to forward the incoming call to your phone. 
 
-If you don't pick up or it's busy, it will either read your voicemail script or play your custom message and record the caller's voicemail.  Once the transcription is ready, it will send you the email with the transcription via Mailgun.
+If you don't pick up or it's busy, it will tell Twilio to read your voicemail script or play your custom message and record the caller's voicemail.  Once the transcription is ready, it will send you the email with the transcription via Mailgun.
 
-If you want to see how it works under the hood, open your browser to http://127.0.0.1:4040.  You'll see the series of requests made by Twilio and this server responding to connect the call.
+If you want to see how it works under the hood, open your browser to http://127.0.0.1:4040.  You'll see the series of requests made by Twilio and this server responding through the lifecycle of the call.
 
 ### Limitations
 
-1.  You cannot make an outgoing call and have it appear to come from your virtual number (yet)
+1.  You cannot make an outgoing call and have it appear to come from your virtual number (yet). This is on the TODO list.  The way it would work is to call your own virtual number, then dial a forwarding number.  For the person you call, it would appear as if the call is coming from your virtual number.
 2.  No SMS or MMS (yet)
-3.  The forwarded calls appear to come from your virtual number.  This is by design, so you can tell that it's a forwarded call.
+3.  The forwarded calls to your phone will appear to come from your virtual number.  This is by design so you can tell that it's a twilio-voice forwarded call and not someone who dialed you directly.
 
 ### Developers
 
