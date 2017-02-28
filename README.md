@@ -12,20 +12,20 @@ Here are some ideas:
 
 * You want to use Google Voice but you live outside the U.S.  This works in the [50+ countries](https://support.twilio.com/hc/en-us/articles/223183068-Twilio-international-phone-number-availability-and-their-capabilities) in which Twilio offers inbound numbers.
 
-If you like this project but need more business features, check out getcontext.io which is aimed at the needs of small businesses and entrepreneurs.
+If you like this project but need more business features, check out [https://getcontext.io](https://getcontext.io) which is aimed at the needs of small businesses and entrepreneurs.
 
 ### Prerequisites
 
 You'll need the following in order to get this running:
 
-1. A Twilio account
-2. A Mailgun account (in order to receive voicemail notifications)
+1. A [Twilio](https://twilio.com) account
+2. A [Mailgun](https://mailgun.com) account (in order to receive voicemail notifications)
 3.  A Linux or OS X computer to run the twilio-voice server.  You can run it on your own computer with [ngrok](https://ngrok.io) or get a cheap cloud server from Linode, Digital Ocean, Vultr, etc.
-4.  Your own domain (in order to receive voicemail notifications)
+4.  Your own domain (in order to send the voicemail notifications)
 
 ### Does this cost money?
 
-Yes, you'll have to pay a per-minute fee for every call, a monthly fee for your virtual phone number, and a few cents per voicemail transcription.  It should be under $10/month unless your phone is ringing off the hook.
+Yes, you'll have to pay a per-minute fee for every call, a monthly fee for your virtual phone number, and a few cents per voicemail transcription.  It should be under $10/month unless your phone is ringing off the hook.  **Check out [Twilio pricing](https://www.twilio.com/voice/pricing) for your area before you run this.  I am not responsible if you run up a big bill.**  
 
 ### Getting it running
 
@@ -92,7 +92,9 @@ That's it!
 
 ### How it works
 
-Twilio will call your server to figure out what to with your call.  What this project does is run a simple server that responds with the commands necessary for Twilio to forward the incoming call to your phone. If you don't pick up or it's busy, it will either read your voicemail script or play your custom message and record the caller's voicemail.  Once the transcription is ready, it will send you the email with the transcription via Mailgun.
+Twilio needs to figure out what to do with your call when someone calls your virtual number.  What this project does is run a simple server that responds with the commands necessary to tell Twilio to forward the incoming call to your phone. 
+
+If you don't pick up or it's busy, it will either read your voicemail script or play your custom message and record the caller's voicemail.  Once the transcription is ready, it will send you the email with the transcription via Mailgun.
 
 If you want to see how it works under the hood, open your browser to http://127.0.0.1:4040.  You'll see the series of requests made by Twilio and this server responding to connect the call.
 
@@ -105,3 +107,7 @@ If you want to see how it works under the hood, open your browser to http://127.
 ### Developers
 
 Check out my Go [TwiML library](https://github.com/BTBurke/twiml) if you want to build additional features.
+
+### Disclaimer
+
+Running this with your own virtual number costs money.  This is only demonstration software and there is no guarantee that it will connect every call or survive under high load.
