@@ -74,7 +74,7 @@ export MAILGUN_DOMAIN="domain you registered with MG"
 export FORWARDING_NUMBER="number you want the calls to forward to"
 export NOTIFICATION_EMAIL="your email"
 export VOICEMAIL_SCRIPT="what you want the voicemail prompt to say"
-export VOICEMAIL_FILE="relative path to a file you want to play for the VM prompt"
+export VOICEMAIL_FILE="relative path to WAV or MP3 file to play as voicemail prompt"
 ```
 
 Now run 

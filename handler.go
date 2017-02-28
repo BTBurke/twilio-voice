@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -71,14 +72,21 @@ func DialAction(cfg Config) func(http.ResponseWriter, *http.Request) {
 		res := twiml.NewResponse()
 		switch status := ca.DialCallStatus; status {
 		case twiml.NoAnswer, twiml.Failed, twiml.Busy:
-			s := twiml.Say{
-				Voice: "woman",
-				Text:  cfg.VoicemailScript,
+			if cfg.EnableCustomPrompt {
+				p := twiml.Play{URL: fmt.Sprintf("/prompt/%s", cfg.VoiceFileName)}
+				res.Add(&p)
+			} else {
+				s := twiml.Say{
+					Voice: "woman",
+					Text:  cfg.VoicemailScript,
+				}
+				res.Add(&s)
 			}
+
 			rec := twiml.Record{
 				TranscribeCallback: "/voicemail",
 			}
-			res.Add(&s, &rec)
+			res.Add(&rec)
 
 			b, err := res.Encode()
 			if err != nil {
