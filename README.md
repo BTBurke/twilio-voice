@@ -20,7 +20,7 @@ You'll need the following in order to get this running:
 
 1. A [Twilio](https://twilio.com) account
 2. A [Mailgun](https://mailgun.com) account (in order to receive voicemail notifications)
-3.  A Linux or OS X computer to run the twilio-voice server.  You can run it on your own computer with [ngrok](https://ngrok.io) or get a cheap cloud server from Linode, Digital Ocean, Vultr, etc.
+3.  A Linux or OS X computer to run the twilio-voice server.  You can run it on your own computer with [ngrok](https://ngrok.io) or get a cheap cloud server from Linode, Digital Ocean, Vultr, etc. This may work on Windows, but I haven't tested it.
 4.  Your own domain (in order to send the voicemail notifications)
 
 ### Does this cost money?
