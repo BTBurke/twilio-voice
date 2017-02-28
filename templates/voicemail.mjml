@@ -1,16 +1,16 @@
 <mjml>
     <mj-body>
         <mj-container>
-        <mj-section>
+        <mj-section text-align="left">
             <mj-column>
                 <mj-text font-size="12" color="#3C3D3D">
                     You have received a voicemail from {{.From}}.  The transcription is below:
                 </mj-text>
             </mj-column>
         </mj-section>
-        <mj-section background-color="#D7DADB">
+        <mj-section background-color="#D7DADB" text-align="left">
             <mj-column>
-                <mj-text font-size="12" padding="15" color="#3C3D3D">
+                <mj-text font-size="12" padding="10" color="#3C3D3D">
                     {{.TranscriptionText}}    
                 </mj-text>
             </mj-column>

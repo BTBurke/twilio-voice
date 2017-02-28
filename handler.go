@@ -1,19 +1,17 @@
-package handler
+package main
 
 import (
 	"log"
 	"net/http"
 
-	"github.com/BTBurke/twilio-forwarder/config"
 	"github.com/BTBurke/twiml"
 )
 
 // CallRequest will return XML to connect to the forwarding number
-func CallRequest(cfg config.Config) func(http.ResponseWriter, *http.Request) {
+func CallRequest(cfg Config) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var cr twiml.VoiceRequest
 		if err := twiml.Bind(&cr, r); err != nil {
-			log.Printf("%v", err)
 			http.Error(w, http.StatusText(400), 400)
 			return
 		}
@@ -30,11 +28,13 @@ func CallRequest(cfg config.Config) func(http.ResponseWriter, *http.Request) {
 				Timeout:  15,
 				CallerID: cr.To,
 			}
-			if err := res.Add(d); err != nil {
+			res.Add(&d)
+			b, err := res.Encode()
+			if err != nil {
 				http.Error(w, http.StatusText(502), 502)
 				return
 			}
-			if err := res.Write(w); err != nil {
+			if _, err := w.Write(b); err != nil {
 				http.Error(w, http.StatusText(502), 502)
 				return
 			}
@@ -42,11 +42,13 @@ func CallRequest(cfg config.Config) func(http.ResponseWriter, *http.Request) {
 			w.WriteHeader(200)
 			return
 		default:
-			if err := res.Add(twiml.Hangup{}); err != nil {
+			res.Add(&twiml.Hangup{})
+			b, err := res.Encode()
+			if err != nil {
 				http.Error(w, http.StatusText(502), 502)
 				return
 			}
-			if err := res.Write(w); err != nil {
+			if _, err := w.Write(b); err != nil {
 				http.Error(w, http.StatusText(502), 502)
 				return
 			}
@@ -58,7 +60,7 @@ func CallRequest(cfg config.Config) func(http.ResponseWriter, *http.Request) {
 }
 
 // DialAction will forward to voicemail if the call is not connected
-func DialAction(cfg config.Config) func(http.ResponseWriter, *http.Request) {
+func DialAction(cfg Config) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var ca twiml.DialActionRequest
 		if err := twiml.Bind(&ca, r); err != nil {
@@ -76,11 +78,14 @@ func DialAction(cfg config.Config) func(http.ResponseWriter, *http.Request) {
 			rec := twiml.Record{
 				TranscribeCallback: "/voicemail",
 			}
-			if err := res.Add(s, rec); err != nil {
+			res.Add(&s, &rec)
+
+			b, err := res.Encode()
+			if err != nil {
 				http.Error(w, http.StatusText(502), 502)
 				return
 			}
-			if err := res.Write(w); err != nil {
+			if _, err := w.Write(b); err != nil {
 				http.Error(w, http.StatusText(502), 502)
 				return
 			}
@@ -92,5 +97,32 @@ func DialAction(cfg config.Config) func(http.ResponseWriter, *http.Request) {
 			return
 
 		}
+	}
+}
+
+// Voicemail handles the TranscriptionCallback which lets you know that transcription is done and the
+// voicemail is available.  If Mailgun is set, it will email a copy of the transcription text and
+// a link to the voicemail to your email address
+func Voicemail(cfg Config) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var tcb twiml.TranscribeCallbackRequest
+		if err := twiml.Bind(&tcb, r); err != nil {
+			log.Printf("%v", err)
+			http.Error(w, http.StatusText(400), 400)
+			return
+		}
+		log.Printf("Call from: %s\n\nTranscription follows:\n%s\n\nVoicemail Link: %s\n", tcb.From, tcb.TranscriptionText, tcb.RecordingURL)
+		if err := Send(cfg, tcb); err != nil {
+			log.Printf("Unable to send notification email due to error: %s\n\nVoicemail available at: %s", err, tcb.RecordingURL)
+		}
+		w.WriteHeader(200)
+	}
+}
+
+// Status receives in-progress status events.  It is outside the mail control loop.  In this case,
+// acknowledging the status to continue the call is the right thing to do.
+func Status(cfg Config) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
 	}
 }

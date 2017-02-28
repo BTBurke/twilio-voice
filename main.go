@@ -6,17 +6,17 @@ import (
 	"os"
 	"time"
 
-	"github.com/BTBurke/twilio-forwarder/config"
-	"github.com/BTBurke/twilio-forwarder/handler"
 	"github.com/pressly/chi"
 	"github.com/pressly/chi/middleware"
 )
 
-var cfg config.Config
+var cfg Config
 
 func init() {
-	cfg = config.Config{
-		MailgunAPIKey:     os.Getenv("MAILGUN_API_KEY"),
+	cfg = Config{
+		MailgunPublicKey:  os.Getenv("MAILGUN_PUBLIC_KEY"),
+		MailgunSecretKey:  os.Getenv("MAILGUN_SECRET_KEY"),
+		MailgunDomain:     os.Getenv("MAILGUN_DOMAIN"),
 		NotificationEmail: os.Getenv("NOTIFICATION_EMAIL"),
 		ForwardingNumber:  os.Getenv("FORWARDING_NUMBER"),
 		VoicemailScript:   os.Getenv("VOICEMAIL_SCRIPT"),
@@ -28,6 +28,9 @@ func init() {
 }
 
 func main() {
+	log.Printf("Forwarding calls to %s\n", cfg.ForwardingNumber)
+	log.Printf("Voicemail notifications will be sent to %s\n", cfg.NotificationEmail)
+
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
@@ -36,12 +39,15 @@ func main() {
 	r.Use(middleware.CloseNotify)
 	r.Use(middleware.Timeout(10 * time.Second))
 
-	r.Post("/call/", handler.CallRequest(cfg))
-	r.Post("/call/action/", handler.DialAction(cfg))
-	// r.Route("/call", func(r chi.Router) {
-	// 	r.Post("/", CallRequest)
-	// 	//r.Post("/action", CallActionCallback)
-	// 	//r.Post("/voicemail", VoicemailActionCallback)
-	// })
+	r.Post("/call/", CallRequest(cfg))
+	r.Post("/call/action/", DialAction(cfg))
+	r.Post("/voicemail", Voicemail(cfg))
+	r.Post("/status", Status(cfg))
+	if cfg.EnableCustomPrompt {
+		log.Printf("Serving custom voicemail prompt from %s\n", cfg.VoicemailFile)
+		r.FileServer("/prompt", http.Dir(cfg.ServeDirectory))
+	}
+
+	log.Println("Listening on 127.0.0.1:8080")
 	http.ListenAndServe(":8080", r)
 }
