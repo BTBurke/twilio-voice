@@ -1,0 +1,13 @@
+{
+    "dependencies": {
+        "github.com/BTBurke/twiml": {
+            "branch": "master"
+        },
+        "github.com/pressly/chi": {
+            "branch": "master"
+        },
+        "gopkg.in/mailgun/mailgun-go.v1": {
+            "branch": "master"
+        }
+    }
+}
