@@ -1,6 +1,7 @@
 package main_test
 
 import (
+	"fmt"
 	"os"
 
 	. "github.com/BTBurke/twilio-voice"
@@ -27,22 +28,33 @@ var _ = Describe("Config", func() {
 			Expect(cfg.Validate()).To(BeEmpty())
 		})
 
-		It("sets default VoicemailScript when VoicemailFile does not exist", func() {
-			cfg.VoicemailFile = "/path/to/a/nonexistent/file.mp3"
-			cfg.VoicemailScript = ""
+		whenVoicemailFile := func(desc, file string) {
+			Context(fmt.Sprintf(`when VoicemailFile is "%s"`, desc), func() {
+				JustBeforeEach(func() {
+					cfg.VoicemailFile = file
+				})
 
-			Expect(cfg.Validate()).To(BeEmpty())
-			Expect(cfg.VoicemailScript).To(Equal("Please leave a message"))
-		})
+				It("sets default VoicemailScript", func() {
+					cfg.VoicemailScript = ""
 
+					Expect(cfg.Validate()).To(BeEmpty())
+					Expect(cfg.VoicemailScript).To(Equal("Please leave a message"))
+				})
+
+				It("does not override custom VoicemailScript", func() {
+					cfg.VoicemailScript = "What do you want?!"
+
+					Expect(cfg.Validate()).To(BeEmpty())
+					Expect(cfg.VoicemailScript).To(Equal("What do you want?!"))
+				})
+			})
+		}
+
+		whenVoicemailFile("non-existent", "/path/to/a/nonexistent/file.mp3")
+		// FIXME(ivy): succeeds even though VoicemailFile is a directory
+		//whenVoicemailFile("directory", "templates")
 		// FIXME(ivy): blank VoicemailFile succeeds
-		XIt("sets default VoicemailScript when VoicemailFile unspecificed", func() {
-			cfg.VoicemailFile = ""
-			cfg.VoicemailScript = ""
-
-			Expect(cfg.Validate()).To(BeEmpty())
-			Expect(cfg.VoicemailScript).To(Equal("Please leave a message"))
-		})
+		//whenVoicemailFile("unspecified", "")
 
 		It("uses specified VoicemailFile when exists", func() {
 			wd, err := os.Getwd()
