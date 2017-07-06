@@ -37,7 +37,7 @@ func (cfg *Config) Validate() (errors []error) {
 		errors = append(errors, fmt.Errorf("set FORWARDING_NUMBER environment variable to connect your incoming calls to your phone"))
 	}
 	// If no voicemail file is accessible and no script is set, falls back to generic voicemail prompt
-	if _, err := os.Stat(fullVoicemailPath); os.IsNotExist(err) {
+	if stat, err := os.Stat(fullVoicemailPath); os.IsNotExist(err) || stat.IsDir() {
 		log.Printf("Voicemail file not found, falling back to voice prompt")
 		cfg.VoicemailFile = ""
 		if len(cfg.VoicemailScript) == 0 {

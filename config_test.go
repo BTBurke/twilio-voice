@@ -51,10 +51,8 @@ var _ = Describe("Config", func() {
 		}
 
 		whenVoicemailFile("non-existent", "/path/to/a/nonexistent/file.mp3")
-		// FIXME(ivy): succeeds even though VoicemailFile is a directory
-		//whenVoicemailFile("directory", "templates")
-		// FIXME(ivy): blank VoicemailFile succeeds
-		//whenVoicemailFile("unspecified", "")
+		whenVoicemailFile("directory", "templates")
+		whenVoicemailFile("unspecified", "")
 
 		It("uses specified VoicemailFile when exists", func() {
 			wd, err := os.Getwd()
