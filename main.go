@@ -22,12 +22,13 @@ func init() {
 		VoicemailScript:   os.Getenv("VOICEMAIL_SCRIPT"),
 		VoicemailFile:     os.Getenv("VOICEMAIL_FILE"),
 	}
-	if errs := cfg.Validate(); len(errs) > 0 {
-		log.Fatalf("%v", errs)
-	}
 }
 
 func main() {
+	if errs := cfg.Validate(); len(errs) > 0 {
+		log.Fatalf("%v", errs)
+	}
+
 	log.Printf("Forwarding calls to %s\n", cfg.ForwardingNumber)
 	log.Printf("Voicemail notifications will be sent to %s\n", cfg.NotificationEmail)
 
