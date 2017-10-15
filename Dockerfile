@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 
-RUN apt-get update && apt-get upgrade
+RUN apt-get update && apt-get -y upgrade
 RUN apt-get install -y apt-transport-https git ca-certificates curl software-properties-common
 RUN mkdir -p /voice
 RUN mkdir -p /voice/vm
