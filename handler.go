@@ -84,7 +84,9 @@ func DialAction(cfg Config) func(http.ResponseWriter, *http.Request) {
 			}
 
 			rec := twiml.Record{
+				Transcribe:         true,
 				TranscribeCallback: "/voicemail",
+				MaxLength:          30,
 			}
 			res.Add(&rec)
 
